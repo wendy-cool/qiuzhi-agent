@@ -1,0 +1,13 @@
+{
+  "name": "qiuzhi-agent",
+  "version": "1.0.0",
+  "description": "求职者深度背调 Agent — 基于 Claude Code Skill 的求职背调工具",
+  "main": "scripts/to-print.js",
+  "scripts": {
+    "print": "node scripts/to-print.js"
+  },
+  "dependencies": {
+    "marked": "^15.0.0"
+  },
+  "license": "MIT"
+}
