@@ -22,7 +22,7 @@
 
 ---
 
-## 七种能力
+## 八种能力
 
 ### 单公司背调
 
@@ -47,6 +47,13 @@
 |------|------|------|------|
 | 自动生成 | `/qiuzhi --build-resume` | 从 profile.md 自动提取信息 → 生成 resume.json → 导出 A4 打印优化 HTML 简历 | ~1 min |
 | 经历匹配 | `/qiuzhi --build-resume --resume "经历"` | 带经历描述的简历生成 | ~1 min |
+
+### 简历诊断与优化
+
+| 模式 | 命令 | 内容 | 用时 |
+|------|------|------|------|
+| 诊断优化 | `/qiuzhi --review` | 粘贴已有简历 → AI 诊断（🔴严重/🟡建议/🟢保持/⚠️缺失）→ 定点修改 → 导出 HTML | ~3 min |
+| 直接诊断 | `/qiuzhi --review "简历内容"` | 直接带简历内容，跳过粘贴步骤 | ~2 min |
 
 ### 面试备战与追踪
 
@@ -93,6 +100,10 @@ cp SKILL.md ~/.claude/skills/qiuzhi/
 # 简历制作（新）
 /qiuzhi --build-resume                                                  # 从 profile.md 自动生成 A4 简历 HTML
 /qiuzhi --build-resume --resume "3年Java后端，熟悉Spring"                # 带经历描述的简历生成
+
+# 简历诊断与优化（新）
+/qiuzhi --review                                                          # 粘贴简历，AI 诊断 + 定点修改
+/qiuzhi --review "我的简历：..."                                           # 直接带简历内容
 
 # 面试备战与追踪（新）
 /qiuzhi --interview "字节跳动"                                           # 进入面试备战中心（4项菜单）
