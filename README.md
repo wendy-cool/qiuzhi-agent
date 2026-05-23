@@ -22,7 +22,7 @@
 
 ---
 
-## 六种能力
+## 七种能力
 
 ### 单公司背调
 
@@ -55,6 +55,13 @@
 | 面试备战 | `/qiuzhi --interview "公司名"` | 4 项菜单：公司深度调研 + 面试模拟训练 + 注意事项与录音 + 面试复盘分析 | 按需 |
 | 岗位聚焦 | `/qiuzhi --interview "公司名" --position "岗位"` | 带岗位聚焦的面试备战 | 按需 |
 | 状态总览 | `/qiuzhi --interview` | 查看所有面试状态追踪 | ~0.5 min |
+
+### Offer 对比决策
+
+| 模式 | 命令 | 内容 | 用时 |
+|------|------|------|------|
+| Offer 对比 | `/qiuzhi --compare "公司A" "公司B"` | 6 维度逐项 PK + 加权评分矩阵 + 最终建议 + 谈判策略 | ~3 min |
+| 岗位聚焦 | `/qiuzhi --compare "公司A" "公司B" --position "岗位"` | 带岗位聚焦的 Offer 对比 | ~3 min |
 
 ---
 
@@ -92,6 +99,10 @@ cp SKILL.md ~/.claude/skills/qiuzhi/
 /qiuzhi --interview "字节跳动" --position "后端开发"                     # 带岗位聚焦的面试备战
 /qiuzhi --interview                                                     # 查看所有面试状态追踪
 
+# Offer 对比决策（新）
+/qiuzhi --compare "字节跳动" "阿里巴巴"                                  # 两家对比
+/qiuzhi --compare "字节跳动" "阿里巴巴" --position "后端开发"               # 带岗位对比
+
 # 也支持直接调用脚本
 node scripts/gen-resume.js resume.json                                   # 从 JSON 配置文件生成简历
 ```
@@ -116,6 +127,7 @@ cp ~/projects/qiuzhi-agent/profile.example.md ~/.claude/skills/qiuzhi/profile.md
 - 行业扫描深度 → `~/Desktop/{行业关键词}_行业扫描_深度_{日期}.md`
 - 简历 HTML → `~/Desktop/{姓名}_简历_{日期}.html`
 - 面试追踪 → `~/.claude/skills/qiuzhi/interviews.md`
+- Offer 对比 → `~/Desktop/{公司A}_vs_{公司B}_Offer对比_{日期}.md`
 
 ### 5. 导出
 
