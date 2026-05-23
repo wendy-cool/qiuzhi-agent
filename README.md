@@ -66,7 +66,7 @@
 
 | 模式 | 命令 | 内容 | 用时 |
 |------|------|------|------|
-| 面试备战 | `/qiuzhi --interview "公司名"` | 4 项菜单：公司深度调研 + 面试模拟训练 + 注意事项与录音 + 面试复盘分析 | 按需 |
+| 面试备战 | `/qiuzhi --interview "公司名"` | 4 项菜单：公司深度调研 + 模拟训练（含真题库） + 注意事项 + 复盘分析（自动入库） | 按需 |
 | 岗位聚焦 | `/qiuzhi --interview "公司名" --position "岗位"` | 带岗位聚焦的面试备战 | 按需 |
 | 状态总览 | `/qiuzhi --interview` | 查看所有面试状态追踪 | ~0.5 min |
 
@@ -160,6 +160,7 @@ cp ~/projects/qiuzhi-agent/profile.example.md ~/.claude/skills/qiuzhi/profile.md
 - 行业扫描深度 → `~/Desktop/{行业关键词}_行业扫描_深度_{日期}.md`
 - 简历 HTML → `~/Desktop/{姓名}_简历_{日期}.html`
 - 面试追踪 → `~/.claude/skills/qiuzhi/interviews.md`
+- 面试真题库 → `~/.claude/skills/qiuzhi/question-bank.md`
 - Offer 对比 → `~/Desktop/{公司A}_vs_{公司B}_Offer对比_{日期}.md`
 - 岗位搜索 → `~/Desktop/{公司名}_在招岗位_{日期}.md`
 
