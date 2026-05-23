@@ -22,7 +22,7 @@
 
 ---
 
-## 四种能力
+## 五种能力
 
 ### 单公司背调
 
@@ -40,6 +40,13 @@
 | 深度扫描 | `/qiuzhi --industry "行业名" --deep` | 快速全部 + TOP10 扩展分析、人才市场深度、分类面试策略、风险全景图、决策看板 | ~15 min |
 | 经历匹配 | `/qiuzhi --industry "行业名" --resume "经历"` | 扫描模式 + 基于用户背景的岗位精准匹配 + 个性化推荐排序 | ~8 min |
 | 岗位聚焦 | `/qiuzhi --industry "行业名" --deep --position "岗位"` | 深度扫描 + 聚焦特定岗位方向 | ~15 min |
+
+### 简历制作
+
+| 模式 | 命令 | 内容 | 用时 |
+|------|------|------|------|
+| 自动生成 | `/qiuzhi --build-resume` | 从 profile.md 自动提取信息 → 生成 resume.json → 导出 A4 打印优化 HTML 简历 | ~1 min |
+| 经历匹配 | `/qiuzhi --build-resume --resume "经历"` | 带经历描述的简历生成 | ~1 min |
 
 ---
 
@@ -67,6 +74,13 @@ cp SKILL.md ~/.claude/skills/qiuzhi/
 /qiuzhi --industry "商业SaaS出海" --deep                              # 深度行业扫描
 /qiuzhi --industry "消费电子出海" --resume "3年Java后端，熟悉Spring"    # 带经历匹配
 /qiuzhi --industry "消费电子出海" --deep --position "后端开发"          # 深度 + 岗位聚焦
+
+# 简历制作（新）
+/qiuzhi --build-resume                                                  # 从 profile.md 自动生成 A4 简历 HTML
+/qiuzhi --build-resume --resume "3年Java后端，熟悉Spring"                # 带经历描述的简历生成
+
+# 也支持直接调用脚本
+node scripts/gen-resume.js resume.json                                   # 从 JSON 配置文件生成简历
 ```
 
 ### 3. 用户档案（可选）
@@ -87,6 +101,7 @@ cp ~/projects/qiuzhi-agent/profile.example.md ~/.claude/skills/qiuzhi/profile.md
 - 单公司深度 → `~/Desktop/{公司名}_求职背调_深度_{日期}.md`
 - 行业扫描快速 → `~/Desktop/{行业关键词}_行业扫描_快速_{日期}.md`
 - 行业扫描深度 → `~/Desktop/{行业关键词}_行业扫描_深度_{日期}.md`
+- 简历 HTML → `~/Desktop/{姓名}_简历_{日期}.html`
 
 ### 5. 导出
 
@@ -239,15 +254,17 @@ qiuzhi-agent/
 ├── README.md                   # 项目说明（本文件）
 ├── CHANGELOG.md                # 版本更新日志
 ├── LICENSE                     # MIT License
-├── SKILL.md                    # Claude Code Skill 核心 Agent Prompt（925行）
+├── SKILL.md                    # Claude Code Skill 核心 Agent Prompt（1000+行）
 ├── profile.example.md          # 用户档案模板（复制到 ~/.claude/skills/qiuzhi/profile.md）
+├── resume.example.json         # 简历 JSON 模板（复制后填写，运行 gen-resume.js 导出 HTML）
 ├── package.json                # Node.js 项目配置（marked 依赖）
 ├── package-lock.json           # 依赖锁定
 ├── .gitignore
 ├── scripts/
 │   ├── to-print.js             # .md → A4 打印优化 HTML（蓝色主题，264行）
 │   ├── to-docx.py              # .md → 排版良好 .docx（基于 python-docx，230行）
-│   └── to-docx.js              # .md → .docx Node.js 封装（macOS textutil）
+│   ├── to-docx.js              # .md → .docx Node.js 封装（macOS textutil）
+│   └── gen-resume.js           # JSON → A4 简历 HTML（黑白极简主题，~180行）
 └── examples/
     └── 帆软_求职背调_深度_20260516.md  # 帆软软件 × 招聘实习生 完整报告（13章）
 ```
@@ -278,7 +295,7 @@ qiuzhi-agent/
 
 ## 版本
 
-当前版本：**v1.0** — 参见 [CHANGELOG.md](CHANGELOG.md)
+当前版本：**v1.2** — 参见 [CHANGELOG.md](CHANGELOG.md)
 
 ## 致谢
 

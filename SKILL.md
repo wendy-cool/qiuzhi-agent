@@ -1,6 +1,6 @@
 ---
 name: qiuzhi
-description: 求职者深度背调Agent。支持单公司背调和行业全景扫描两种模式。输入目标公司名称或行业，自动完成公司画像、产品矩阵分析、竞品对比、面试策略，生成结构化的求职背调报告。支持快速（5-8分钟）和深度（15分钟）两种模式。新增 --industry 行业扫描、--resume 经历匹配。
+description: 求职者深度背调Agent。支持单公司背调、行业全景扫描和简历制作三种模式。输入目标公司名称或行业，自动完成公司画像、产品矩阵分析、竞品对比、面试策略，生成结构化的求职背调报告和A4打印优化简历。支持快速（5-8分钟）和深度（15分钟）两种模式。新增 --industry 行业扫描、--build-resume 简历制作、--resume 经历匹配。
 skill_type: prompt
 ---
 
@@ -27,7 +27,14 @@ skill_type: prompt
 /qiuzhi --industry "消费电子出海" --deep --position "后端开发"         # 深度扫描 + 岗位聚焦
 ```
 
-> **模式判断**：如果用户输入中包含 `--industry "行业名"` → 执行行业扫描模式；否则 → 执行单公司背调模式。
+### 简历制作（新能力）
+
+```
+/qiuzhi --build-resume                                     # 从 profile.md 自动生成 resume.json 并导出 HTML 简历
+/qiuzhi --build-resume --resume "经历描述"                   # 带经历描述的简历生成
+```
+
+> **模式判断**：如果用户输入中包含 `--industry "行业名"` → 执行行业扫描模式；包含 `--build-resume` → 执行简历制作模式；否则 → 执行单公司背调模式。
 > **档案加载**：如果指定了 `--resume "经历描述"` → 直接用该经历做岗位匹配；否则自动尝试读取 `~/.claude/skills/qiuzhi/profile.md` 作为用户档案；若都不存在 → 生成通用报告并提示用户创建档案。
 
 ## --position 岗位定制模式
@@ -98,6 +105,78 @@ skill_type: prompt
 
 ---
 
+## --build-resume 简历制作模式
+
+当用户通过 `--build-resume` 触发简历制作时，你的任务是：读取用户档案，自动生成结构化的 `resume.json` 配置文件，然后调用脚本生成 A4 打印优化的 HTML 简历。
+
+### 工作流程
+
+#### 步骤 1：加载用户档案
+
+- 如果指定了 `--resume "经历"` → 直接使用
+- 否则读取 `~/.claude/skills/qiuzhi/profile.md`
+- 若都不存在 → 引导用户创建 `profile.md` 或直接提供基本信息
+
+#### 步骤 2：提取并补全简历字段
+
+从用户档案中提取以下信息，缺失的字段向用户询问：
+
+| 简历字段 | 来源 |
+|---------|------|
+| name | 从 profile.md 的"当前/最近职位"推断，或直接询问 |
+| targetPosition | 从"目标岗位类型"提取 |
+| phone/email | 必须向用户确认（profile.md 通常不包含这些隐私信息） |
+| tags | 从"核心竞争力"和"差异化亮点"提炼 3-4 个标签 |
+| education | 从"教育背景"提取，缺少则询问 |
+| coreCompetencies | 从"核心竞争力"+"差异化亮点"提炼 4 个能力 |
+| experiences | 从"代表项目/关键成果"转化，需要用户补充时间、公司名等细节 |
+| skills | 从"核心技术栈"+"个人优势"转化 |
+
+#### 步骤 3：生成 resume.json
+
+将提取的信息写入 `~/.claude/skills/qiuzhi/resume.json`，格式参考 `~/projects/qiuzhi-agent/resume.example.json`。
+
+在生成前，向用户展示提取的内容摘要，让用户确认。
+
+#### 步骤 4：调用脚本生成 HTML
+
+```bash
+node ~/projects/qiuzhi-agent/scripts/gen-resume.js ~/.claude/skills/qiuzhi/resume.json
+```
+
+脚本会：
+- 读取 JSON 配置
+- 生成 A4 打印优化 HTML（与设计模板一致的排版和字体）
+- 保存到 `~/Desktop/{姓名}_简历_{日期}.html`
+- 自动在浏览器打开
+
+#### 步骤 5：输出结果
+
+告知用户：
+```
+✅ 简历已生成并在浏览器中打开
+📄 路径：~/Desktop/{姓名}_简历_{日期}.html
+🖨 按 Cmd+P 即可打印，建议导出为 PDF
+```
+
+### 简历设计说明
+
+生成的 HTML 采用以下设计规范（与用户模板一致）：
+- **页面**：A4 纵向（210×297mm），四周均衡页边距
+- **字体**：Inter（标题）+ PingFang SC / Microsoft YaHei（正文）
+- **配色**：黑白灰极简风格，深色标题 + 浅灰标签
+- **模块**：头部（姓名/岗位/联系方式/照片/标签）→ 教育背景 → 核心竞争力（2×2 网格）→ 实习经历 → 校园/项目经历 → 技能
+- **核心视觉特征**：section 标题下方 2.5px 黑色短横线装饰，bullet 灰色圆点，标签浅灰背景
+
+### 注意事项
+
+- **隐私安全**：phone/email 等隐私信息必须向用户确认，不要从搜索或推测中填入
+- **JSON 本地存储**：生成的 `resume.json` 保存在 `~/.claude/skills/qiuzhi/` 目录，不回传
+- **照片处理**：如果用户提供了照片路径，确保路径可访问；否则使用占位图
+- **内容克制**：简历是正式文档，不要编造经历或夸大成果，信息必须来自用户本人
+
+---
+
 ## 核心原则
 
 ### 1. 求职视角翻译（最重要）
@@ -138,14 +217,18 @@ skill_type: prompt
 在执行任何搜索之前，先判断用户的意图：
 
 ```
+用户输入中包含 --build-resume？
+  ├── 是 → 执行【模式C：简历制作模式】
+  └── 否 → 继续判断
+
 用户输入中包含 --industry "行业名"？
   ├── 是 → 执行【模式B：行业扫描模式】
   └── 否 → 执行【模式A：单公司背调模式】
 ```
 
-- `--industry` 与公司名同时存在时，`--industry` 优先，忽略公司名
-- `--position` 在两个模式中都可用：单公司模式中定制全报告，行业模式中作为岗位过滤器
-- `--resume` 仅在行业模式中生效
+- `--build-resume` 优先于 `--industry`，优先于公司名
+- `--position` 在模式 A/B 中都可用：单公司模式中定制全报告，行业模式中作为岗位过滤器
+- `--resume` 在模式 B 和模式 C 中生效：都用于加载用户背景
 
 ---
 
@@ -278,6 +361,37 @@ node ~/projects/qiuzhi-agent/scripts/to-print.js ~/Desktop/{报告文件名}.md
 快速模式：~/Desktop/{行业关键词}_行业扫描_快速_{日期}.md
 深度模式：~/Desktop/{行业关键词}_行业扫描_深度_{日期}.md
 ```
+
+---
+
+### 【模式C：简历制作模式】
+
+#### ⚠️ 档案加载（生成前必须完成）
+
+在生成简历前，确定用户信息：
+
+1. 如果用户指定了 `--resume "经历"` → 直接使用
+2. 否则，用 Read 工具读取 `~/.claude/skills/qiuzhi/profile.md`
+3. 若读取成功 → 将其内容作为用户档案
+4. 若读取失败 → 引导用户：告诉用户需要先创建 profile.md，或使用 --resume 提供基本信息
+
+#### 执行步骤
+
+1. **提取信息**：从 profile.md 提取姓名、教育、技能、经历、求职偏好等信息
+2. **补全缺失字段**：phone/email 等隐私字段必须向用户确认；照片路径可选
+3. **生成 resume.json**：将信息整理为标准 JSON 格式，写入 `~/.claude/skills/qiuzhi/resume.json`
+4. **调用脚本**：运行 `node ~/projects/qiuzhi-agent/scripts/gen-resume.js ~/.claude/skills/qiuzhi/resume.json`
+5. **告知结果**：报告生成的 HTML 文件路径，提醒用户 Cmd+P 打印
+
+#### 与单公司/行业模式的区别
+
+| 维度 | 单公司/行业模式 | 简历制作模式 |
+|------|--------------|-----------|
+| 输入 | 公司名 / 行业名 | 用户档案 (profile.md) |
+| 核心动作 | 搜索 + 分析 | 提取 + 生成 |
+| 输出 | Markdown 报告 | HTML 简历 + JSON 配置 |
+| 网络请求 | 有（多次搜索） | 无（纯本地） |
+| 输出位置 | 桌面 .md 文件 | 桌面 .html 文件 |
 
 ---
 
@@ -923,3 +1037,12 @@ node ~/projects/qiuzhi-agent/scripts/to-print.js ~/Desktop/{报告文件名}.md
 15. **TOP N 排名**：深度模式的 TOP3/TOP4-8 需综合用户匹配度 + 公司实力，不是单纯按市值/规模
 16. **如果行业名模糊**（如"互联网"范围太宽），可以主动向用户确认是否指某个细分方向，或在报告中说明已覆盖主要细分赛道
 17. **无用户档案时**：生成通用推荐报告，在报告末尾提醒用户可以创建 `~/.claude/skills/qiuzhi/profile.md` 或使用 `--resume` 来获得个性化岗位匹配
+
+### 简历制作模式专属
+
+18. **模式判断优先**：`--build-resume` 优先于 `--industry`，两者互斥
+19. **隐私保护**：phone/email 等隐私信息必须向用户确认，不得从搜索或推测中填入
+20. **内容真实**：简历是正式文档，所有信息必须来自用户档案或用户确认，不得编造经历
+21. **照片处理**：如果 profile.md 中有照片路径，验证其可访问；否则使用 placeholder
+22. **脚本调用**：生成 resume.json 后，用 Bash 工具运行 `node ~/projects/qiuzhi-agent/scripts/gen-resume.js ~/.claude/skills/qiuzhi/resume.json`
+23. **不搜索**：简历制作模式不需要任何 WebSearch，全程本地操作

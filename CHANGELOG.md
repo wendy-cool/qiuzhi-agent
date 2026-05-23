@@ -1,5 +1,33 @@
 # CHANGELOG
 
+## v1.2 (2026-05-23)
+
+### 新增功能 — 简历制作
+
+- **`--build-resume` 标志**：从用户档案自动生成结构化简历，导出 A4 打印优化 HTML
+  - 自动从 `profile.md` 提取姓名、教育、技能、经历等信息
+  - 缺失字段（phone/email）自动引导用户补充
+  - 调用 `scripts/gen-resume.js` 生成 HTML 并在浏览器打开
+- **`resume.example.json`**：标准化简历 JSON 模板，用户复制后填写即可
+- **`scripts/gen-resume.js`**：独立脚本，读取 JSON → 生成 A4 简历 HTML → 自动打开浏览器
+  - Tailwind CSS CDN + 自定义打印样式
+  - Inter + PingFang SC 字体，黑白极简设计
+  - 自动处理缺失字段（无照片时显示占位图）
+
+### 设计规范
+
+- A4 纵向（210×297mm），四周均衡页边距
+- 简历模块：头部（姓名/岗位/联系方式/照片/标签）→ 教育背景 → 核心竞争力（2×2） → 实习经历 → 校园/项目经历 → 技能
+- 打印时自动适配，Cmd+P 直接导出 PDF
+
+### 变更的文件
+
+- `resume.example.json`：新建简历模板
+- `scripts/gen-resume.js`：新建简历生成脚本
+- `SKILL.md`：新增 --build-resume 模式定义、工作流程、实现注意事项（模式C）
+- `README.md`：四种能力→五种能力，新增简历制作模式说明
+- `CHANGELOG.md`：本文件
+
 ## v1.1 (2026-05-23)
 
 ### 新增功能 — 行业全景扫描
