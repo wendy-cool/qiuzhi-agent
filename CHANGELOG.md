@@ -1,5 +1,31 @@
 # CHANGELOG
 
+## v2.0 (2026-05-23)
+
+### 重构 — SKILL.md 模块化拆分
+
+- **问题**：SKILL.md 2101 行，8 个模式全部耦合在一个文件中。每加一个模式 100-200 行增量，维护成本持续上升。
+- **方案**：拆分为 1 个核心路由文件（~175 行）+ 8 个自包含模式文件（modes/*.md）
+  - `SKILL.md`：路由入口，包含触发方式、模式判断优先级、核心原则、通用实现注意事项
+  - `modes/single-company.md`（~419 行）：模式 A，单公司背调
+  - `modes/industry-scan.md`（~445 行）：模式 B，行业全景扫描
+  - `modes/build-resume.md`（~212 行）：模式 C1，简历制作
+  - `modes/review-resume.md`（~118 行）：模式 C2，简历诊断
+  - `modes/update.md`（~101 行）：模式 G，报告增量更新
+  - `modes/interview.md`（~309 行）：模式 D，面试备战与追踪
+  - `modes/compare.md`（~286 行）：模式 E，Offer 对比决策
+  - `modes/jobs.md`（~126 行）：模式 F，岗位搜索与投递
+- **按需加载**：Agent 运行时 Read 对应 mode 文件，不再将全部 2000+ 行装入上下文
+- **模式文件路径**：优先读 `~/projects/qiuzhi-agent/modes/`（项目源），若不存在则尝试 `~/.claude/skills/qiuzhi/modes/`（安装位置）
+- **每个 mode 文件自包含**：模式章节 + 工作流程 + 报告模板 + 实现注意事项，顶部引用声明继承核心原则
+
+### 变更的文件
+
+- `SKILL.md`：从 2101 行精简为 ~175 行路由文件
+- `modes/*.md`：新建 8 个模式文件（共 ~2016 行）
+- `README.md`：更新项目结构说明
+- `CHANGELOG.md`：本文件
+
 ## v1.8 (2026-05-23)
 
 ### 新增功能 — 面试真题库沉淀

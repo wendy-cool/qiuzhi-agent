@@ -315,7 +315,16 @@ qiuzhi-agent/
 ├── README.md                   # 项目说明（本文件）
 ├── CHANGELOG.md                # 版本更新日志
 ├── LICENSE                     # MIT License
-├── SKILL.md                    # Claude Code Skill 核心 Agent Prompt（1000+行）
+├── SKILL.md                    # 核心路由文件（~175行），负责模式判断和路由
+├── modes/                      # 模式实现文件（由 SKILL.md 按需 Read 加载）
+│   ├── single-company.md       # 模式 A：单公司背调（~419行）
+│   ├── industry-scan.md        # 模式 B：行业全景扫描（~445行）
+│   ├── build-resume.md         # 模式 C1：简历制作（~212行）
+│   ├── review-resume.md        # 模式 C2：简历诊断（~118行）
+│   ├── update.md               # 模式 G：报告增量更新（~101行）
+│   ├── interview.md            # 模式 D：面试备战与追踪（~309行）
+│   ├── compare.md              # 模式 E：Offer 对比决策（~286行）
+│   └── jobs.md                 # 模式 F：岗位搜索与投递（~126行）
 ├── profile.example.md          # 用户档案模板（复制到 ~/.claude/skills/qiuzhi/profile.md）
 ├── resume.example.json         # 简历 JSON 模板（复制后填写，运行 gen-resume.js 导出 HTML）
 ├── package.json                # Node.js 项目配置（marked 依赖）
@@ -330,15 +339,12 @@ qiuzhi-agent/
     └── 帆软_求职背调_深度_20260516.md  # 帆软软件 × 招聘实习生 完整报告（13章）
 ```
 
-**SKILL.md** 是整个项目的核心——它是 Claude Code 执行 `/qiuzhi` 命令时加载的完整 Agent 提示词，定义了：
-- 触发方式和参数解析（`--deep`、`--position`、`--industry`、`--resume`）
-- 模式判断分支（单公司 vs 行业扫描）
-- 单公司模式：3 轮 14 个并行搜索 + 快速/深度报告模板
-- 行业扫描模式：3 轮 20 个并行搜索 + 行业全景报告模板（含 20 家公司深挖）
-- 求职视角翻译的核心原则
-- `--position` 岗位定制的 4 维度匹配分析框架
-- 用户档案机制（`--resume` / `profile.md`）
-- 17 条实现注意事项
+**SKILL.md** 是路由入口——它判断用户意图后 Read 对应 `modes/` 文件执行。每个 mode 文件自包含：模式章节、工作流程、报告模板、实现注意事项。
+
+关键设计：
+- **按需加载**：Agent 运行时只加载当前模式文件，不再将全部 8 个模式（2000+行）装入上下文
+- **模式判断优先级**：`--build-resume` > `--review` > `--update` > `--interview` > `--compare` > `--jobs` > `--industry` > 公司名
+- **共享机制**：核心原则（求职视角翻译、并行搜索、信息可信度标记）在 SKILL.md 中定义，各 mode 文件通过顶部引用声明继承
 
 ---
 
@@ -356,7 +362,7 @@ qiuzhi-agent/
 
 ## 版本
 
-当前版本：**v1.2** — 参见 [CHANGELOG.md](CHANGELOG.md)
+当前版本：**v2.0** — 参见 [CHANGELOG.md](CHANGELOG.md)
 
 ## 致谢
 
