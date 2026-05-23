@@ -22,13 +22,24 @@
 
 ---
 
-## 三种模式
+## 四种能力
+
+### 单公司背调
 
 | 模式 | 命令 | 内容 | 用时 |
 |------|------|------|------|
 | 快速 | `/qiuzhi <公司名>` | 6 大模块：公司基本面、产品总览、人才信号、风险清单、求职速评、信息核实 | ~5 min |
 | 深度 | `/qiuzhi --deep <公司名>` | 快速全部 + 产品深度拆解、竞品对比、组织洞察、面试攻略、薪资发展、决策矩阵 | ~15 min |
 | 岗位定制 | `/qiuzhi <公司名> --position "岗位"` | 深度模式 + 技术栈精准匹配 + 岗位面试备战 + 薪资精准参考 | ~15 min |
+
+### 行业全景扫描
+
+| 模式 | 命令 | 内容 | 用时 |
+|------|------|------|------|
+| 快速扫描 | `/qiuzhi --industry "行业名"` | 5 大模块：行业全景、20 家公司深挖、横向对比矩阵、求职策略、信息核实 | ~8 min |
+| 深度扫描 | `/qiuzhi --industry "行业名" --deep` | 快速全部 + TOP10 扩展分析、人才市场深度、分类面试策略、风险全景图、决策看板 | ~15 min |
+| 经历匹配 | `/qiuzhi --industry "行业名" --resume "经历"` | 扫描模式 + 基于用户背景的岗位精准匹配 + 个性化推荐排序 | ~8 min |
+| 岗位聚焦 | `/qiuzhi --industry "行业名" --deep --position "岗位"` | 深度扫描 + 聚焦特定岗位方向 | ~15 min |
 
 ---
 
@@ -46,18 +57,38 @@ cp SKILL.md ~/.claude/skills/qiuzhi/
 ### 2. 使用
 
 ```bash
+# 单公司背调
 /qiuzhi 字节跳动                              # 快速模式
 /qiuzhi --deep 帆软                           # 深度模式
 /qiuzhi --deep 帆软 --position "招聘实习生"    # 岗位定制
+
+# 行业全景扫描（新）
+/qiuzhi --industry "消费电子出海"                                     # 快速行业扫描
+/qiuzhi --industry "商业SaaS出海" --deep                              # 深度行业扫描
+/qiuzhi --industry "消费电子出海" --resume "3年Java后端，熟悉Spring"    # 带经历匹配
+/qiuzhi --industry "消费电子出海" --deep --position "后端开发"          # 深度 + 岗位聚焦
 ```
 
-### 3. 输出
+### 3. 用户档案（可选）
+
+创建 `~/.claude/skills/qiuzhi/profile.md` 保存你的求职档案，行业扫描时自动读取进行岗位匹配：
+
+```bash
+cp ~/projects/qiuzhi-agent/profile.example.md ~/.claude/skills/qiuzhi/profile.md
+# 编辑 profile.md 填写你的信息
+```
+
+也可以直接通过 `--resume "经历描述"` 传入，优先级高于 profile.md。
+
+### 4. 输出
 
 报告自动保存至桌面：
-- 快速模式 → `~/Desktop/{公司名}_求职背调_快速_{日期}.md`
-- 深度模式 → `~/Desktop/{公司名}_求职背调_深度_{日期}.md`
+- 单公司快速 → `~/Desktop/{公司名}_求职背调_快速_{日期}.md`
+- 单公司深度 → `~/Desktop/{公司名}_求职背调_深度_{日期}.md`
+- 行业扫描快速 → `~/Desktop/{行业关键词}_行业扫描_快速_{日期}.md`
+- 行业扫描深度 → `~/Desktop/{行业关键词}_行业扫描_深度_{日期}.md`
 
-### 4. 导出
+### 5. 导出
 
 ```bash
 # 打印优化 HTML（浏览器打开，直接 Cmd+P）
@@ -208,7 +239,8 @@ qiuzhi-agent/
 ├── README.md                   # 项目说明（本文件）
 ├── CHANGELOG.md                # 版本更新日志
 ├── LICENSE                     # MIT License
-├── SKILL.md                    # Claude Code Skill 核心 Agent Prompt（453行）
+├── SKILL.md                    # Claude Code Skill 核心 Agent Prompt（925行）
+├── profile.example.md          # 用户档案模板（复制到 ~/.claude/skills/qiuzhi/profile.md）
 ├── package.json                # Node.js 项目配置（marked 依赖）
 ├── package-lock.json           # 依赖锁定
 ├── .gitignore
@@ -221,12 +253,14 @@ qiuzhi-agent/
 ```
 
 **SKILL.md** 是整个项目的核心——它是 Claude Code 执行 `/qiuzhi` 命令时加载的完整 Agent 提示词，定义了：
-- 触发方式和参数解析
-- 3 轮 14 个并行搜索的信息采集架构
+- 触发方式和参数解析（`--deep`、`--position`、`--industry`、`--resume`）
+- 模式判断分支（单公司 vs 行业扫描）
+- 单公司模式：3 轮 14 个并行搜索 + 快速/深度报告模板
+- 行业扫描模式：3 轮 20 个并行搜索 + 行业全景报告模板（含 20 家公司深挖）
 - 求职视角翻译的核心原则
-- 快速/深度两份完整的 Markdown 报告模板
 - `--position` 岗位定制的 4 维度匹配分析框架
-- 10 条实现注意事项
+- 用户档案机制（`--resume` / `profile.md`）
+- 17 条实现注意事项
 
 ---
 
