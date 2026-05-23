@@ -22,7 +22,7 @@
 
 ---
 
-## 五种能力
+## 六种能力
 
 ### 单公司背调
 
@@ -47,6 +47,14 @@
 |------|------|------|------|
 | 自动生成 | `/qiuzhi --build-resume` | 从 profile.md 自动提取信息 → 生成 resume.json → 导出 A4 打印优化 HTML 简历 | ~1 min |
 | 经历匹配 | `/qiuzhi --build-resume --resume "经历"` | 带经历描述的简历生成 | ~1 min |
+
+### 面试备战与追踪
+
+| 模式 | 命令 | 内容 | 用时 |
+|------|------|------|------|
+| 面试备战 | `/qiuzhi --interview "公司名"` | 4 项菜单：公司深度调研 + 面试模拟训练 + 注意事项与录音 + 面试复盘分析 | 按需 |
+| 岗位聚焦 | `/qiuzhi --interview "公司名" --position "岗位"` | 带岗位聚焦的面试备战 | 按需 |
+| 状态总览 | `/qiuzhi --interview` | 查看所有面试状态追踪 | ~0.5 min |
 
 ---
 
@@ -79,6 +87,11 @@ cp SKILL.md ~/.claude/skills/qiuzhi/
 /qiuzhi --build-resume                                                  # 从 profile.md 自动生成 A4 简历 HTML
 /qiuzhi --build-resume --resume "3年Java后端，熟悉Spring"                # 带经历描述的简历生成
 
+# 面试备战与追踪（新）
+/qiuzhi --interview "字节跳动"                                           # 进入面试备战中心（4项菜单）
+/qiuzhi --interview "字节跳动" --position "后端开发"                     # 带岗位聚焦的面试备战
+/qiuzhi --interview                                                     # 查看所有面试状态追踪
+
 # 也支持直接调用脚本
 node scripts/gen-resume.js resume.json                                   # 从 JSON 配置文件生成简历
 ```
@@ -102,6 +115,7 @@ cp ~/projects/qiuzhi-agent/profile.example.md ~/.claude/skills/qiuzhi/profile.md
 - 行业扫描快速 → `~/Desktop/{行业关键词}_行业扫描_快速_{日期}.md`
 - 行业扫描深度 → `~/Desktop/{行业关键词}_行业扫描_深度_{日期}.md`
 - 简历 HTML → `~/Desktop/{姓名}_简历_{日期}.html`
+- 面试追踪 → `~/.claude/skills/qiuzhi/interviews.md`
 
 ### 5. 导出
 
